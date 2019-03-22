@@ -74,6 +74,21 @@ function setUpModels() {
       }
     },
       { timestamps: false, }),
+    "music": database.define('music', {
+      title: {
+        type: Sequelize.TEXT,
+      },
+      artist: {
+        type: Sequelize.TEXT,
+      },
+      year: {
+        type: Sequelize.INTEGER,
+      },
+      format: {
+        type: Sequelize.INTEGER
+      },
+    },
+      { timestamps: false, }),
     "todos": database.define('todos', {
       type: {
         type: Sequelize.TEXT,

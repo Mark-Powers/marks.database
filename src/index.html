@@ -16,29 +16,42 @@
                     activeTab: 0,
                     movies: [],
                     books: [],
+                    music: [],
                     todos: [],
                     showMovieTable: false,
                     showBookTable: false,
                     showTodoTable: false,
-                    m: {
-                        year: new Date().getFullYear(),
-                        title: "",
-                        director: ""
-                    },
-                    b: {
-                        year: new Date().getFullYear(),
-                        title: "",
-                        author: "",
-                        is_read: 1,
-                        is_owned: 1
-                    },
-                    t: {
-                        type: "",
-                        title: "",
-                        notes: "",
-                    }
+
                 },
                 methods: {
+                    setTab: function (value) {
+                        this.activeTab = value;
+                    },
+                    clearData: function () {
+                        this.m = {
+                            year: new Date().getFullYear(),
+                            title: "",
+                            director: ""
+                        }
+                        this.b = {
+                            year: new Date().getFullYear(),
+                            title: "",
+                            author: "",
+                            is_read: 1,
+                            is_owned: 1
+                        }
+                        this.t = {
+                            type: "",
+                            title: "",
+                            notes: "",
+                        }
+                        this.mu = {
+                            title: "",
+                            artist: "",
+                            year: new Date().getFullYear(),
+                            format: 0,
+                        }
+                    },
                     requestThenUpdate: function (name, request) {
                         fetch(request)
                             .then(response => response.json())
@@ -81,18 +94,24 @@
                     postTodo: function (event) {
                         this.post(this.t, 'todos', '/todos', event)
                     },
-                    removeTodo: function (book, event) {
+                    removeTodo: function (t, event) {
                         this.remove(t, 'todos', '/todos', event);
                     },
-                    setTab: function (value) {
-                        this.activeTab = value;
-                    }
+                    postMusic: function (event) {
+                        this.post(this.mu, 'music', '/music', event)
+                    },
+                    removeMusic: function (mu, event) {
+                        this.remove(mu, 'music', '/music', event);
+                    },
                 },
                 created() {
+                    this.clearData();
                     fetch(new Request('/movies')).then(response => response.json())
                         .then(response => this.movies = response);
                     fetch(new Request('/books')).then(response => response.json())
                         .then(response => this.books = response);
+                    fetch(new Request('/music')).then(response => response.json())
+                        .then(response => this.music = response);
                     fetch(new Request('/todos')).then(response => response.json())
                         .then(response => this.todos = response);
                 }
@@ -103,12 +122,15 @@
         td {
             border: 1px solid lightgrey;
         }
+
         table {
             max-width: 100%;
         }
+
         .bold {
             font-weight: bold;
         }
+
         #data {
             width: 100%;
         }
@@ -121,7 +143,8 @@
         <div>
             <button v-bind:class="{ bold: activeTab == 0 }" v-on:click="setTab(0)">Movies</button>
             <button v-bind:class="{ bold: activeTab == 1 }" v-on:click="setTab(1)">Books</button>
-            <button v-bind:class="{ bold: activeTab == 2 }" v-on:click="setTab(2)">To Do</button>
+            <button v-bind:class="{ bold: activeTab == 2 }" v-on:click="setTab(2)">Music</button>
+            <button v-bind:class="{ bold: activeTab == 3 }" v-on:click="setTab(3)">To Do</button>
         </div>
 
         <table class="table" v-if="activeTab == 0">
@@ -198,6 +221,48 @@
         </table>
 
         <table class="table" v-if="activeTab == 2">
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Artist</th>
+                <th>Year</th>
+                <th>Format</th>
+                <th></th>
+            </tr>
+            <tr class="newItem">
+                <td>
+                </td>
+                <td>
+                    <input v-model="mu.title" placeholder="Title">
+                </td>
+                <td>
+                    <input v-model="mu.artist" placeholder="Artist">
+                </td>
+                <td>
+                    <input v-model="mu.year" placeholder="Year" size="4">
+                </td>
+                <td>
+                    <select v-model="mu.format">
+                        <option disabled value="">Select...</option>
+                        <option value="0">Vinyl</option>
+                        <option value="1">CD</option>
+                    </select>
+                </td>
+                <td><button v-on:click="postMusic">Add</button></td>
+            </tr>
+            <tr v-for="(m, i) in music">
+                <td>{{i+1}}</td>
+                <td>{{m.title}}</td>
+                <td>{{m.artist}}</td>
+                <td>{{m.year}}</td>
+                <td>{{
+                    m.format == 0 ? 'Vinyl' : m.format == 1 ? 'CD' : 'Digital'
+                }}</td>
+                <td><button v-on:click="removeMusic(m, $event)">X</button></td>
+            </tr>
+        </table>
+
+        <table class="table" v-if="activeTab == 3">
             <tr>
                 <th></th>
                 <th>Type</th>
