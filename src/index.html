@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Mark's Database</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+    <script>
+        window.onload = function () {
+            var movieData = new Vue({
+                el: '#data',
+                data: {
+                    activeTab: 0,
+                    movies: [],
+                    books: [],
+                    todos: [],
+                    showMovieTable: false,
+                    showBookTable: false,
+                    showTodoTable: false,
+                    m: {
+                        year: new Date().getFullYear(),
+                        title: "",
+                        director: ""
+                    },
+                    b: {
+                        year: new Date().getFullYear(),
+                        title: "",
+                        author: "",
+                        is_read: 1,
+                        is_owned: 1
+                    },
+                    t: {
+                        type: "",
+                        title: "",
+                        notes: "",
+                    }
+                },
+                methods: {
+                    requestThenUpdate: function (name, request) {
+                        fetch(request)
+                            .then(response => response.json())
+                            .then(response => this[name] = response);
+                    },
+                    post: function (obj, name, path, event) {
+                        this.requestThenUpdate(name, new Request(path, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(obj)
+                        }));
+                    },
+                    remove: function (obj, name, path, event) {
+                        if (confirm(`Delete "${obj.title}"?`)) {
+                            this.requestThenUpdate(name, new Request(path, {
+                                method: 'delete',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(obj)
+                            }))
+                        }
+                    },
+                    postMovie: function (event) {
+                        this.post(this.m, 'movies', '/movies', event)
+                    },
+                    removeMovie: function (movie, event) {
+                        this.remove(movie, 'movies', '/movies', event);
+                    },
+                    postBook: function (event) {
+                        this.post(this.b, 'books', '/books', event)
+                    },
+                    removeBook: function (book, event) {
+                        this.remove(book, 'books', '/books', event);
+                    },
+                    postTodo: function (event) {
+                        this.post(this.t, 'todos', '/todos', event)
+                    },
+                    removeTodo: function (book, event) {
+                        this.remove(t, 'todos', '/todos', event);
+                    },
+                    setTab: function (value) {
+                        this.activeTab = value;
+                    }
+                },
+                created() {
+                    fetch(new Request('/movies')).then(response => response.json())
+                        .then(response => this.movies = response);
+                    fetch(new Request('/books')).then(response => response.json())
+                        .then(response => this.books = response);
+                    fetch(new Request('/todos')).then(response => response.json())
+                        .then(response => this.todos = response);
+                }
+            });
+        }
+    </script>
+    <style>
+        td {
+            border: 1px solid lightgrey;
+        }
+        table {
+            max-width: 100%;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        #data {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Mark's Database</h1>
+    <div id="data">
+        <div>
+            <button v-bind:class="{ bold: activeTab == 0 }" v-on:click="setTab(0)">Movies</button>
+            <button v-bind:class="{ bold: activeTab == 1 }" v-on:click="setTab(1)">Books</button>
+            <button v-bind:class="{ bold: activeTab == 2 }" v-on:click="setTab(2)">To Do</button>
+        </div>
+
+        <table class="table" v-if="activeTab == 0">
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Director</th>
+                <th>Year</th>
+                <th></th>
+            </tr>
+            <tr class="newItem">
+                <td>
+                </td>
+                <td>
+                    <input v-model="m.title" placeholder="Title">
+                </td>
+                <td>
+                    <input v-model="m.director" placeholder="Director">
+                </td>
+                <td>
+                    <input v-model="m.year" placeholder="Year" size="4">
+                </td>
+                <td><button v-on:click="postMovie">Add</button></td>
+            </tr>
+            <tr v-for="(movie, i) in movies">
+                <td>{{i+1}}</td>
+                <td>{{movie.title}}</td>
+                <td>{{movie.director}}</td>
+                <td>{{movie.year}}</td>
+                <td><button v-on:click="removeMovie(movie, $event)">X</button></td>
+            </tr>
+
+        </table>
+
+        <table class="table" v-if="activeTab == 1">
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+                <th>Read?</th>
+                <th>Owned?</th>
+                <th></th>
+            </tr>
+            <tr class="newItem">
+                <td>
+                </td>
+                <td>
+                    <input v-model="b.title" placeholder="Title">
+                </td>
+                <td>
+                    <input v-model="b.author" placeholder="Author">
+                </td>
+                <td>
+                    <input v-model="b.year" placeholder="Year" size="4">
+                </td>
+                <td>
+                    <input v-model="b.is_read" placeholder="Read?" size="2">
+                </td>
+                <td>
+                    <input v-model="b.is_owned" placeholder="Owned?" size="2">
+                </td>
+                <td><button v-on:click="postBook">Add</button></td>
+            </tr>
+            <tr v-for="(book, i) in books">
+                <td>{{i+1}}</td>
+                <td>{{book.title}}</td>
+                <td>{{book.author}}</td>
+                <td>{{book.year}}</td>
+                <td>{{book.is_read}}</td>
+                <td>{{book.is_owned}}</td>
+                <td><button v-on:click="removeBook(book, $event)">X</button></td>
+            </tr>
+        </table>
+
+        <table class="table" v-if="activeTab == 2">
+            <tr>
+                <th></th>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Notes</th>
+                <th></th>
+            </tr>
+            <tr class="newItem">
+                <td>
+                </td>
+                <td>
+                    <input v-model="t.type" placeholder="Type">
+                </td>
+                <td>
+                    <input v-model="t.title" placeholder="Title">
+                </td>
+                <td>
+                    <input v-model="t.notes" placeholder="Note">
+                </td>
+                <td><button v-on:click="postTodo">Add</button></td>
+            </tr>
+            <tr v-for="(todo, i) in todos">
+                <td>{{i+1}}</td>
+                <td>{{todo.type}}</td>
+                <td>{{todo.title}}</td>
+                <td>{{todo.notes}}</td>
+                <td><button v-on:click="removeTodo(todo, $event)">X</button></td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+
+</html>
