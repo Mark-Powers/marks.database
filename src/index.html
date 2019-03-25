@@ -21,7 +21,7 @@
                     showMovieTable: false,
                     showBookTable: false,
                     showTodoTable: false,
-
+                    selTodoType: "all"
                 },
                 methods: {
                     setTab: function (value) {
@@ -106,14 +106,30 @@
                 },
                 created() {
                     this.clearData();
-                    fetch(new Request('/movies')).then(response => response.json())
-                        .then(response => this.movies = response);
-                    fetch(new Request('/books')).then(response => response.json())
-                        .then(response => this.books = response);
-                    fetch(new Request('/music')).then(response => response.json())
-                        .then(response => this.music = response);
-                    fetch(new Request('/todos')).then(response => response.json())
-                        .then(response => this.todos = response);
+                    ["movies", "books", "music", "todos", "foods"].forEach(item =>{
+                        fetch(new Request(`/${item}`)).then(response => response.json())
+                            .then(response => this[item] = response);    
+                    })
+                },
+                computed: {
+                    todoTypes: function () {
+                        var types = [];
+                        this.todos.forEach(todo => {
+                            if (!types.includes(todo.type)) {
+                                types.push(todo.type);
+                            }
+                        })
+                        return types;
+                    },
+                    todoFilter: function () {
+                        if (this.selTodoType == "all") {
+                            return this.todos;
+                        } else {
+                            return this.todos.filter(todo => {
+                                return todo.type == this.selTodoType;
+                            })
+                        }
+                    }
                 }
             });
         }
@@ -145,8 +161,10 @@
             <button v-bind:class="{ bold: activeTab == 1 }" v-on:click="setTab(1)">Books</button>
             <button v-bind:class="{ bold: activeTab == 2 }" v-on:click="setTab(2)">Music</button>
             <button v-bind:class="{ bold: activeTab == 3 }" v-on:click="setTab(3)">To Do</button>
+            <button v-bind:class="{ bold: activeTab == 4 }" v-on:click="setTab(4)">Meal Planner</button>
         </div>
 
+        <!-- Movies -->
         <table class="table" v-if="activeTab == 0">
             <tr>
                 <th></th>
@@ -179,6 +197,7 @@
 
         </table>
 
+        <!-- Books -->
         <table class="table" v-if="activeTab == 1">
             <tr>
                 <th></th>
@@ -220,6 +239,7 @@
             </tr>
         </table>
 
+        <!-- Music -->
         <table class="table" v-if="activeTab == 2">
             <tr>
                 <th></th>
@@ -262,36 +282,50 @@
             </tr>
         </table>
 
-        <table class="table" v-if="activeTab == 3">
-            <tr>
-                <th></th>
-                <th>Type</th>
-                <th>Title</th>
-                <th>Notes</th>
-                <th></th>
-            </tr>
-            <tr class="newItem">
-                <td>
-                </td>
-                <td>
-                    <input v-model="t.type" placeholder="Type">
-                </td>
-                <td>
-                    <input v-model="t.title" placeholder="Title">
-                </td>
-                <td>
-                    <input v-model="t.notes" placeholder="Note">
-                </td>
-                <td><button v-on:click="postTodo">Add</button></td>
-            </tr>
-            <tr v-for="(todo, i) in todos">
-                <td>{{i+1}}</td>
-                <td>{{todo.type}}</td>
-                <td>{{todo.title}}</td>
-                <td>{{todo.notes}}</td>
-                <td><button v-on:click="removeTodo(todo, $event)">X</button></td>
-            </tr>
-        </table>
+        <!-- To Do -->
+        <div v-if="activeTab == 3">
+            <span>
+                Filter:
+                <select v-model="selTodoType">
+                    <option>all</option>
+                    <option v-for="type in todoTypes">{{type}}</option>
+                </select>
+            </span>
+            <table class="table">
+                <tr>
+                    <th></th>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Notes</th>
+                    <th></th>
+                </tr>
+                <tr class="newItem">
+                    <td>
+                    </td>
+                    <td>
+                        <input v-model="t.type" placeholder="Type">
+                    </td>
+                    <td>
+                        <input v-model="t.title" placeholder="Title">
+                    </td>
+                    <td>
+                        <input v-model="t.notes" placeholder="Note">
+                    </td>
+                    <td><button v-on:click="postTodo">Add</button></td>
+                </tr>
+                <tr v-for="(todo, i) in todoFilter">
+                    <td>{{i+1}}</td>
+                    <td>{{todo.type}}</td>
+                    <td>{{todo.title}}</td>
+                    <td>{{todo.notes}}</td>
+                    <td><button v-on:click="removeTodo(todo, $event)">X</button></td>
+                </tr>
+            </table>
+        </div>
+        <!-- Meal Planner -->
+        <div v-if="activeTab == 4">
+
+        </div>
     </div>
 
 </body>

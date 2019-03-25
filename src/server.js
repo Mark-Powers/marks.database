@@ -94,6 +94,15 @@ function setUpRoutes(models, jwtFunctions, database) {
     server.delete('/music', async (req, res, next) => {
         await deleteTable('music', req, res, next);
     })
+    server.get('/foods', async (req, res, next) => {
+        await getTable('foods', req, res, next, "name");
+    })
+    server.post('/foods', async (req, res, next) => {
+        await postTable('foods', req, res, next, "name");
+    })
+    server.delete('/foods', async (req, res, next) => {
+        await deleteTable('foods', req, res, next, "name");
+    })
 
 }
 

@@ -45,62 +45,38 @@ async function sync(alter, force, callback) {
 function setUpModels() {
   const models = {
     "movies": database.define('movies', {
-      title: {
-        type: Sequelize.TEXT,
-      },
-      director: {
-        type: Sequelize.TEXT,
-      },
-      year: {
-        type: Sequelize.INTEGER,
-      }
+      title: Sequelize.TEXT,
+      director: Sequelize.TEXT,
+      year: Sequelize.INTEGER,
     },
       { timestamps: false, }),
     "books": database.define('books', {
-      title: {
-        type: Sequelize.TEXT,
-      },
-      author: {
-        type: Sequelize.TEXT,
-      },
-      year: {
-        type: Sequelize.INTEGER,
-      },
-      is_read: {
-        type: Sequelize.BOOLEAN
-      },
-      is_owned: {
-        type: Sequelize.BOOLEAN
-      }
+      title: Sequelize.TEXT,
+      author: Sequelize.TEXT,
+      year: Sequelize.INTEGER,
+      is_read: Sequelize.BOOLEAN,
+      is_owned: Sequelize.BOOLEAN
     },
       { timestamps: false, }),
     "music": database.define('music', {
-      title: {
-        type: Sequelize.TEXT,
-      },
-      artist: {
-        type: Sequelize.TEXT,
-      },
-      year: {
-        type: Sequelize.INTEGER,
-      },
-      format: {
-        type: Sequelize.INTEGER
-      },
+      title: Sequelize.TEXT,
+      artist: Sequelize.TEXT,
+      year: Sequelize.INTEGER,
+      format: Sequelize.INTEGER
     },
       { timestamps: false, }),
     "todos": database.define('todos', {
-      type: {
-        type: Sequelize.TEXT,
-      },
-      title: {
-        type: Sequelize.TEXT,
-      },
-      notes: {
-        type: Sequelize.TEXT,
-      },
+      type: Sequelize.TEXT,
+      title: Sequelize.TEXT,
+      notes: Sequelize.TEXT,
     },
       { timestamps: false, }),
+    "foods": database.define('foods', {
+        name: Sequelize.TEXT,
+        notes: Sequelize.TEXT,
+        status: Sequelize.INTEGER,
+      },
+        { timestamps: false, }),
   }
 
   return models;
