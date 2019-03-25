@@ -10,6 +10,7 @@ function listen(port) {
 
 function setUpRoutes(models, jwtFunctions, database) {
     server.use(function (req, res, next) {
+        // Hack to ensure only local user can access this
         if(req.ip.endsWith("127.0.0.1")){
             next()
         } else {
@@ -58,52 +59,18 @@ function setUpRoutes(models, jwtFunctions, database) {
         }
     }
 
-    server.get('/movies', async (req, res, next) => {
-        await getTable('movies', req, res, next);
+    let routes = [["movies"], ["books"], ["todos", "type, title"], ["music"], ["foods", "name"]];
+    routes.forEach((route) =>{
+        server.get(`/${route[0]}`, async (req, res, next) => {
+            await getTable(route[0], req, res, next, route[1]);
+        })
+        server.post(`/${route[0]}`, async (req, res, next) => {
+            await postTable(route[0], req, res, next, route[1]);
+        })
+        server.delete(`/${route[0]}`, async (req, res, next) => {
+            await deleteTable(route[0], req, res, next, route[1]);
+        })
     })
-    server.post('/movies', async (req, res, next) => {
-        await postTable('movies', req, res, next);
-    })
-    server.delete('/movies', async (req, res, next) => {
-        await deleteTable('movies', req, res, next);
-    })
-    server.get('/books', async (req, res, next) => {
-        await getTable('books', req, res, next);
-    })
-    server.post('/books', async (req, res, next) => {
-        await postTable('books', req, res, next);
-    })
-    server.delete('/books', async (req, res, next) => {
-        await deleteTable('books', req, res, next);
-    })
-    server.get('/todos', async (req, res, next) => {
-        await getTable('todos', req, res, next, "type, title");
-    })
-    server.post('/todos', async (req, res, next) => {
-        await postTable('todos', req, res, next, "type, title");
-    })
-    server.delete('/todos', async (req, res, next) => {
-        await deleteTable('todos', req, res, next, "type, title");
-    })
-    server.get('/music', async (req, res, next) => {
-        await getTable('music', req, res, next);
-    })
-    server.post('/music', async (req, res, next) => {
-        await postTable('music', req, res, next);
-    })
-    server.delete('/music', async (req, res, next) => {
-        await deleteTable('music', req, res, next);
-    })
-    server.get('/foods', async (req, res, next) => {
-        await getTable('foods', req, res, next, "name");
-    })
-    server.post('/foods', async (req, res, next) => {
-        await postTable('foods', req, res, next, "name");
-    })
-    server.delete('/foods', async (req, res, next) => {
-        await deleteTable('foods', req, res, next, "name");
-    })
-
 }
 
 module.exports = {
