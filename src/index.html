@@ -18,6 +18,7 @@
                     books: [],
                     music: [],
                     todos: [],
+                    foods: [],
                     showMovieTable: false,
                     showBookTable: false,
                     showTodoTable: false,
@@ -51,6 +52,11 @@
                             year: new Date().getFullYear(),
                             format: 0,
                         }
+                        this.f = {
+                            name: "",
+                            note: "",
+                            status: 0
+                        }
                     },
                     requestThenUpdate: function (name, request) {
                         fetch(request)
@@ -67,8 +73,10 @@
                             body: JSON.stringify(obj)
                         }));
                     },
-                    remove: function (obj, name, path, event) {
-                        if (confirm(`Delete "${obj.title}"?`)) {
+                    remove: function (obj, name, path, title="title") {
+                        console.log(title)
+                        console.log(obj);
+                        if (confirm(`Delete "${obj[title]}"?`)) {
                             this.requestThenUpdate(name, new Request(path, {
                                 method: 'delete',
                                 headers: {
@@ -79,36 +87,12 @@
                             }))
                         }
                     },
-                    postMovie: function (event) {
-                        this.post(this.m, 'movies', '/movies', event)
-                    },
-                    removeMovie: function (movie, event) {
-                        this.remove(movie, 'movies', '/movies', event);
-                    },
-                    postBook: function (event) {
-                        this.post(this.b, 'books', '/books', event)
-                    },
-                    removeBook: function (book, event) {
-                        this.remove(book, 'books', '/books', event);
-                    },
-                    postTodo: function (event) {
-                        this.post(this.t, 'todos', '/todos', event)
-                    },
-                    removeTodo: function (t, event) {
-                        this.remove(t, 'todos', '/todos', event);
-                    },
-                    postMusic: function (event) {
-                        this.post(this.mu, 'music', '/music', event)
-                    },
-                    removeMusic: function (mu, event) {
-                        this.remove(mu, 'music', '/music', event);
-                    },
                 },
                 created() {
                     this.clearData();
-                    ["movies", "books", "music", "todos", "foods"].forEach(item =>{
+                    ["movies", "books", "music", "todos", "foods"].forEach(item => {
                         fetch(new Request(`/${item}`)).then(response => response.json())
-                            .then(response => this[item] = response);    
+                            .then(response => this[item] = response);
                     })
                 },
                 computed: {
@@ -185,14 +169,14 @@
                 <td>
                     <input v-model="m.year" placeholder="Year" size="4">
                 </td>
-                <td><button v-on:click="postMovie">Add</button></td>
+                <td><button v-on:click="post(m, 'movies', '/movies')">Add</button></td>
             </tr>
             <tr v-for="(movie, i) in movies">
                 <td>{{i+1}}</td>
                 <td>{{movie.title}}</td>
                 <td>{{movie.director}}</td>
                 <td>{{movie.year}}</td>
-                <td><button v-on:click="removeMovie(movie, $event)">X</button></td>
+                <td><button v-on:click="remove(movie, 'movies', '/movies')">X</button></td>
             </tr>
 
         </table>
@@ -226,7 +210,7 @@
                 <td>
                     <input v-model="b.is_owned" placeholder="Owned?" size="2">
                 </td>
-                <td><button v-on:click="postBook">Add</button></td>
+                <td><button v-on:click="post(b, 'books', '/books')">Add</button></td>
             </tr>
             <tr v-for="(book, i) in books">
                 <td>{{i+1}}</td>
@@ -235,7 +219,7 @@
                 <td>{{book.year}}</td>
                 <td>{{book.is_read}}</td>
                 <td>{{book.is_owned}}</td>
-                <td><button v-on:click="removeBook(book, $event)">X</button></td>
+                <td><button v-on:click="remove(book, 'books', '/books')">X</button></td>
             </tr>
         </table>
 
@@ -268,7 +252,7 @@
                         <option value="1">CD</option>
                     </select>
                 </td>
-                <td><button v-on:click="postMusic">Add</button></td>
+                <td><button v-on:click="post(mu, 'music', '/music')">Add</button></td>
             </tr>
             <tr v-for="(m, i) in music">
                 <td>{{i+1}}</td>
@@ -278,7 +262,7 @@
                 <td>{{
                     m.format == 0 ? 'Vinyl' : m.format == 1 ? 'CD' : 'Digital'
                 }}</td>
-                <td><button v-on:click="removeMusic(m, $event)">X</button></td>
+                <td><button v-on:click="remove(m, 'music', '/music')">X</button></td>
             </tr>
         </table>
 
@@ -311,20 +295,56 @@
                     <td>
                         <input v-model="t.notes" placeholder="Note">
                     </td>
-                    <td><button v-on:click="postTodo">Add</button></td>
+                    <td><button v-on:click="post(t, 'todos', '/todos')">Add</button></td>
                 </tr>
                 <tr v-for="(todo, i) in todoFilter">
                     <td>{{i+1}}</td>
                     <td>{{todo.type}}</td>
                     <td>{{todo.title}}</td>
                     <td>{{todo.notes}}</td>
-                    <td><button v-on:click="removeTodo(todo, $event)">X</button></td>
+                    <td><button v-on:click="remove(todo, 'todos', '/todos')">X</button></td>
                 </tr>
             </table>
         </div>
         <!-- Meal Planner -->
         <div v-if="activeTab == 4">
-
+            <table class="table">
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Note</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+                <tr class="newItem">
+                    <td>
+                    </td>
+                    <td>
+                        <input v-model="f.name" placeholder="Name">
+                    </td>
+                    <td>
+                        <input v-model="f.note" placeholder="Note">
+                    </td>
+                    <td>
+                        <select v-model="f.status">
+                            <option disabled value="">Select...</option>
+                            <option value="0">Owned</option>
+                            <option value="1">To buy</option>
+                            <option value="2">Previously owned</option>
+                        </select>
+                    </td>
+                    <td><button v-on:click="post(f, 'foods', '/foods')">Add</button></td>
+                </tr>
+                <tr v-for="(food, i) in foods">
+                    <td>{{i+1}}</td>
+                    <td>{{food.name}}</td>
+                    <td>{{food.note}}</td>
+                    <td>{{
+                                food.status == 0 ? 'Owned' : m.format == 1 ? 'To buy' : 'Previously owned'
+                            }}</td>
+                    <td><button v-on:click="remove(food, 'foods', '/foods', 'name')">X</button></td>
+                </tr>
+            </table>
         </div>
     </div>
 
