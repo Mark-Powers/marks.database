@@ -83,6 +83,7 @@ function setUpModels() {
       { timestamps: false, }),
     "recipes": database.define('recipes', {
       name: Sequelize.TEXT,
+      instructions: Sequelize.TEXT,
     },
       { timestamps: false, }),
   }

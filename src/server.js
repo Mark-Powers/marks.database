@@ -24,6 +24,9 @@ function setUpRoutes(models, jwtFunctions, database) {
     })
 
     server.get('/', (req, res) => res.sendFile(__dirname + "/index.html"))
+    server.get('/styles.css', (req, res) => res.sendFile(__dirname + "/styles.css"))
+    server.get('/main.js', (req, res) => res.sendFile(__dirname + "/main.js"))
+
     var getTable = async function (name, req, res, next, orderby = "title") {
         try {
             var result = await database.query(`SELECT * FROM ${name} order by ${orderby}`, { type: database.QueryTypes.SELECT })
@@ -102,7 +105,7 @@ function setUpRoutes(models, jwtFunctions, database) {
     }
     server.post("/recipes", async (req, res, next) => {
         try {
-            const newRecipe = await models["recipes"].create({ name: req.body.name })
+            const newRecipe = await models["recipes"].create({ name: req.body.name, instructions: req.body.instructions })
             req.body.ingredients.forEach(async (ingredient) => {
                 await models["ingredients"].create({
                     "quantity": ingredient.quantity, "foodId": ingredient.id, "recipeId": newRecipe.id
