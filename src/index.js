@@ -72,13 +72,22 @@ function setUpModels() {
     },
       { timestamps: false, }),
     "foods": database.define('foods', {
-        name: Sequelize.TEXT,
-        notes: Sequelize.TEXT,
-        status: Sequelize.INTEGER,
-      },
-        { timestamps: false, }),
+      name: Sequelize.TEXT,
+      notes: Sequelize.TEXT,
+      status: Sequelize.INTEGER,
+    },
+      { timestamps: false, }),
+    "ingredients": database.define('ingredients', {
+      quantity: Sequelize.TEXT,
+    },
+      { timestamps: false, }),
+    "recipes": database.define('recipes', {
+      name: Sequelize.TEXT,
+    },
+      { timestamps: false, }),
   }
-
+  models["ingredients"].belongsTo(models["foods"])
+  models["ingredients"].belongsTo(models["recipes"])
   return models;
 }
 

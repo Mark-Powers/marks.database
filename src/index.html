@@ -19,10 +19,13 @@
                     music: [],
                     todos: [],
                     foods: [],
-                    showMovieTable: false,
-                    showBookTable: false,
-                    showTodoTable: false,
-                    selTodoType: "all"
+                    recipes: [],
+                    displayedRecipes: [],
+                    ingredients: [],
+                    showFoodTable: false,
+                    recipeName: "",
+                    selTodoType: "all",
+                    selFoodType: "all"
                 },
                 methods: {
                     setTab: function (value) {
@@ -72,8 +75,9 @@
                             },
                             body: JSON.stringify(obj)
                         }));
+                        this.clearData();
                     },
-                    remove: function (obj, name, path, title="title") {
+                    remove: function (obj, name, path, title = "title") {
                         console.log(title)
                         console.log(obj);
                         if (confirm(`Delete "${obj[title]}"?`)) {
@@ -87,10 +91,60 @@
                             }))
                         }
                     },
+                    update: function (obj, name, path, field, value) {
+                        update = {}
+                        update[field] = value
+                        this.requestThenUpdate(name, new Request(path, {
+                            method: 'put',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ id: obj.id, update: update })
+                        }))
+                    },
+                    findById: function (list, id) {
+                        return list.find(i => {
+                            return i.id == id;
+                        });
+                    },
+                    addIngredient: function (food) {
+                        var quantity = prompt("Quantity:", "");
+                        if (quantity) {
+                            this.ingredients.push({ id: food.id, quantity: quantity });
+                        }
+                    },
+                    removeIngredient: function (index) {
+                        this.ingredients.splice(index, 1);
+                    },
+                    submitRecipe: function () {
+                        if (confirm(`Create recipe "${this.recipeName}"?`)) {
+                            var obj = {
+                                name: this.recipeName,
+                                ingredients: this.ingredients
+                            }
+                            this.requestThenUpdate("recipes", new Request("/recipes", {
+                                method: 'POST',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(obj)
+                            }))
+                        }
+                    },
+                    toggleRecipe: function(i) {
+                        if(this.displayedRecipes.includes(i)){
+                            var index = this.displayedRecipes.indexOf(i);
+                            this.displayedRecipes.splice(index, 1);
+                        } else {
+                            this.displayedRecipes.push(i);
+                        }
+                    }
                 },
                 created() {
                     this.clearData();
-                    ["movies", "books", "music", "todos", "foods"].forEach(item => {
+                    ["movies", "books", "music", "todos", "foods", "recipes"].forEach(item => {
                         fetch(new Request(`/${item}`)).then(response => response.json())
                             .then(response => this[item] = response);
                     })
@@ -113,7 +167,16 @@
                                 return todo.type == this.selTodoType;
                             })
                         }
-                    }
+                    },
+                    foodFilter: function () {
+                        if (this.selFoodType == "all") {
+                            return this.foods;
+                        } else {
+                            return this.foods.filter(food => {
+                                return food.status == this.selFoodType;
+                            })
+                        }
+                    },
                 }
             });
         }
@@ -127,6 +190,15 @@
             max-width: 100%;
         }
 
+        li {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        tr:nth-child(2n+1) {
+            background-color: lightgray;
+        }
+
         .bold {
             font-weight: bold;
         }
@@ -134,6 +206,14 @@
         #data {
             width: 100%;
         }
+
+        .border {
+            border: 1px solid lightgrey;
+        }
+
+        /* div {
+            padding: 1em;
+        } */
     </style>
 </head>
 
@@ -308,43 +388,99 @@
         </div>
         <!-- Meal Planner -->
         <div v-if="activeTab == 4">
-            <table class="table">
-                <tr>
-                    <th></th>
-                    <th>Name</th>
-                    <th>Note</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-                <tr class="newItem">
-                    <td>
-                    </td>
-                    <td>
-                        <input v-model="f.name" placeholder="Name">
-                    </td>
-                    <td>
-                        <input v-model="f.note" placeholder="Note">
-                    </td>
-                    <td>
-                        <select v-model="f.status">
-                            <option disabled value="">Select...</option>
-                            <option value="0">Owned</option>
-                            <option value="1">To buy</option>
-                            <option value="2">Previously owned</option>
-                        </select>
-                    </td>
-                    <td><button v-on:click="post(f, 'foods', '/foods')">Add</button></td>
-                </tr>
-                <tr v-for="(food, i) in foods">
-                    <td>{{i+1}}</td>
-                    <td>{{food.name}}</td>
-                    <td>{{food.note}}</td>
-                    <td>{{
-                                food.status == 0 ? 'Owned' : m.format == 1 ? 'To buy' : 'Previously owned'
-                            }}</td>
-                    <td><button v-on:click="remove(food, 'foods', '/foods', 'name')">X</button></td>
-                </tr>
-            </table>
+            <label><input type="checkbox" v-model="showFoodTable">Show foods</label>
+            <div v-if="showFoodTable">
+                <span>
+                    Filter:
+                    <select v-model="selFoodType">
+                        <option>all</option>
+                        <option value="0">Owned</option>
+                        <option value="1">Shopping List</option>
+                        <option value="2">Previously Owned</option>
+                    </select>
+                </span>
+                <table class="table">
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Note</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                    <tr class="newItem">
+                        <td>
+                        </td>
+                        <td>
+                            <input v-model="f.name" placeholder="Name">
+                        </td>
+                        <td>
+                            <input v-model="f.notes" placeholder="Note">
+                        </td>
+                        <td>
+                            <select v-model="f.status">
+                                <option disabled value="">Select...</option>
+                                <option value="0">Owned</option>
+                                <option value="1">To buy</option>
+                                <option value="2">Previously owned</option>
+                            </select>
+                        </td>
+                        <td><button v-on:click="post(f, 'foods', '/foods')">Add</button></td>
+                    </tr>
+                    <tr v-for="(food, i) in foodFilter">
+                        <td>{{i+1}}</td>
+                        <td>{{food.name}}</td>
+                        <td>{{food.notes}}</td>
+                        <td>
+                            <span v-if="food.status == 0">
+                                Owned
+                            </span>
+                            <span v-if="food.status == 1">
+                                To buy
+                            </span>
+                            <span v-if="food.status == 2">
+                                Previously Owned
+                            </span>
+                        </td>
+                        <td>
+                            <!-- <button v-on:click="update(food, 'foods', '/foods', 'name')">X</button> -->
+                            <button v-on:click="update(food, 'foods', '/foods', 'status', 0)">Owned</button>
+                            <button v-on:click="update(food, 'foods', '/foods', 'status', 1)">To buy</button>
+                            <button v-on:click="update(food, 'foods', '/foods', 'status', 2)">Empty</button>
+                            <button v-on:click="remove(food, 'foods', '/foods', 'name')">X</button>
+                            <button v-on:click="addIngredient(food)">New Ingred.</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="border">
+                New Recipe:
+                <input v-model="recipeName" placeholder="Recipe Name">
+                <table>
+                    <tr v-for="(item, i) in ingredients">
+                        <td>{{item.quantity}}</td>
+                        <td>{{findById(foods, item.id).name}}</td>
+                        <td><button v-on:click="removeIngredient(i)">X</button></td>
+                    </tr>
+                </table>
+                <button v-on:click="submitRecipe()">Create Recipe</button>
+            </div>
+            <div class="border">
+                Recipes:
+                <ul>
+                    <li v-for="(item, i) in recipes" v-on:click="toggleRecipe(i)">
+                        {{item.name}}
+                    </li>
+                </ul>
+                <div v-for="(recipe, i) in recipes" v-if="displayedRecipes.includes(i)" class="border">
+                    {{recipe.name}}
+                    <table>
+                        <tr v-for="(item, i) in recipe.ingredients">
+                            <td>{{item.quantity}}</td>
+                            <td>{{item.food.name}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
