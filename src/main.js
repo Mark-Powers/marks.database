@@ -11,11 +11,11 @@ window.onload = function () {
             recipes: [],
             displayedRecipes: [],
             ingredients: [],
-            showFoodTable: false,
+            showFoodTable: true,
             recipeName: "",
             recipeInstructions: "",
             selTodoType: "all",
-            selFoodType: "all"
+            selFoodType: "1"
         },
         methods: {
             setTab: function (value) {
@@ -131,6 +131,14 @@ window.onload = function () {
                 } else {
                     this.displayedRecipes.push(i);
                 }
+            },
+            exportShoppingList: function(){
+                var list = "Shopping list:\n"
+                this.foodFilter.forEach(item => {
+                    list += item.name + "\n";
+                })
+                console.log(list);
+                navigator.clipboard.writeText(list)
             }
         },
         created() {

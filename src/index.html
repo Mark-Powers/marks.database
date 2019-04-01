@@ -194,6 +194,9 @@
                         <option value="2">Previously Owned</option>
                     </select>
                 </span>
+                <span v-if="selFoodType == 1">
+                    <button v-on:click="exportShoppingList()">Export</button>
+                </span>
                 <table class="table">
                     <tr>
                         <th></th>
