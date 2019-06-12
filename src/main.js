@@ -27,6 +27,12 @@ window.onload = function () {
                     title: "",
                     director: ""
                 }
+                this.em = {
+                    year: new Date().getFullYear(),
+                    title: "",
+                    director: "",
+                    id:""
+                }
                 this.b = {
                     year: new Date().getFullYear(),
                     title: "",
@@ -93,6 +99,18 @@ window.onload = function () {
                     body: JSON.stringify({ id: obj.id, update: update })
                 }))
             },
+            updateMany: function (obj, name, path) {
+                update = {}
+                update = obj;
+                this.requestThenUpdate(name, new Request(path, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: obj.id, update: update })
+                }))
+            },
             findById: function (list, id) {
                 return list.find(i => {
                     return i.id == id;
@@ -139,6 +157,13 @@ window.onload = function () {
                 })
                 console.log(list);
                 navigator.clipboard.writeText(list)
+            },
+            prepareMovieEntryEdit: function(movie){
+                this.em.id=movie.id;
+                this.em.title=movie.title;
+                this.em.director=movie.director;
+                this.em.year=movie.year;
+                this.activeTab=10;
             }
         },
         created() {

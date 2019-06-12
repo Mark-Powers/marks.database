@@ -30,7 +30,7 @@
                 <th>Title</th>
                 <th>Director</th>
                 <th>Year</th>
-                <th></th>
+                <th>Actions</th>
             </tr>
             <tr class="newItem">
                 <td>
@@ -51,10 +51,30 @@
                 <td>{{movie.title}}</td>
                 <td>{{movie.director}}</td>
                 <td>{{movie.year}}</td>
-                <td><button v-on:click="remove(movie, 'movies', '/movies')">X</button></td>
+                <td>
+                    <button v-on:click="prepareMovieEntryEdit(movie)">&#9881;</button>
+                    <button v-on:click="remove(movie, 'movies', '/movies')">X</button>
+                </td>
             </tr>
 
         </table>
+
+        <table v-if="activeTab == 10">
+            <tr>
+                    <th></th>
+                    <th>Title</th>
+                    <th>Director</th>
+                    <th>Year</th>
+                    <th>Actions</th>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input v-model="em.title" placeholder="Title"></td>
+                <td><input v-model="em.director" placeholder="Director"></td>
+                <td><input v-model="em.year" placeholder="Year" size="4"></td>
+                <td><button v-on:click="updateMany(em, 'movies', '/movies');activeTab=0;">Update</button></td>
+            </tr>
+        </div>
 
         <!-- Books -->
         <table class="table" v-if="activeTab == 1">
