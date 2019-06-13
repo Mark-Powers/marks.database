@@ -99,6 +99,9 @@ function setUpRoutes(models, jwtFunctions, database) {
     server.put("/books", async (req, res, next) => {
         await updateTable("books", req, res, next, "title");
     })
+    server.put("/music", async (req, res, next) => {
+        await updateTable("music", req, res, next, "title");
+    })
     async function getRecipes() {
         var recipes = await database.query(`SELECT * FROM recipes order by name`, { type: database.QueryTypes.SELECT })
         for (const recipe of recipes) {

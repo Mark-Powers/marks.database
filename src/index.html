@@ -59,6 +59,7 @@
 
         </table>
 
+        <!-- Movies Update Entry -->
         <table v-if="activeTab == 10">
             <tr>
                     <th></th>
@@ -110,6 +111,27 @@
                 </td>
             </tr>
         </table>
+
+        <!-- Movies Update Entry -->
+        <table v-if="activeTab == 11">
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+                <th>Read?</th>
+                <th>Owned?</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td><input v-model="eb.title" placeholder="Title"></td>
+                <td><input v-model="eb.author" placeholder="Author"></td>
+                <td><input v-model="eb.year" placeholder="Year" size="4"></td>
+                <td><input v-model="eb.is_read" placeholder="Read?" size="2"></td>
+                <td><input v-model="eb.is_owned" placeholder="Owned?" size="2"></td>
+                <td><button v-on:click="updateMany(eb, 'books', '/books');activeTab=1;">Update</button></td>
+            </tr>
+        </div>
 
         <!-- Music -->
         <table class="table" v-if="activeTab == 2">
