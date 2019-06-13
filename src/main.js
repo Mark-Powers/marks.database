@@ -40,6 +40,14 @@ window.onload = function () {
                     is_read: 1,
                     is_owned: 1
                 }
+                this.eb = {
+                    year: new Date().getFullYear(),
+                    title: "",
+                    author: "",
+                    is_read: 1,
+                    is_owned: 1,
+                    id:""
+                }
                 this.t = {
                     type: "",
                     title: "",
@@ -164,6 +172,15 @@ window.onload = function () {
                 this.em.director=movie.director;
                 this.em.year=movie.year;
                 this.activeTab=10;
+            },
+            prepareBookEntryEdit: function(book){
+                this.eb.id = book.id;
+                this.eb.title = book.title;
+                this.eb.author = book.author;
+                this.eb.year = book.year;
+                this.eb.is_read = book.is_read;
+                this.eb.is_owned = book.is_owned;
+                this.activeTab = 11;
             }
         },
         created() {

@@ -85,26 +85,16 @@
                 <th>Year</th>
                 <th>Read?</th>
                 <th>Owned?</th>
-                <th></th>
+                <th>Actions</th>
             </tr>
             <tr class="newItem">
                 <td>
                 </td>
-                <td>
-                    <input v-model="b.title" placeholder="Title">
-                </td>
-                <td>
-                    <input v-model="b.author" placeholder="Author">
-                </td>
-                <td>
-                    <input v-model="b.year" placeholder="Year" size="4">
-                </td>
-                <td>
-                    <input v-model="b.is_read" placeholder="Read?" size="2">
-                </td>
-                <td>
-                    <input v-model="b.is_owned" placeholder="Owned?" size="2">
-                </td>
+                <td><input v-model="b.title" placeholder="Title"></td>
+                <td><input v-model="b.author" placeholder="Author"></td>
+                <td><input v-model="b.year" placeholder="Year" size="4"></td>
+                <td><input v-model="b.is_read" placeholder="Read?" size="2"></td>
+                <td><input v-model="b.is_owned" placeholder="Owned?" size="2"></td>
                 <td><button v-on:click="post(b, 'books', '/books')">Add</button></td>
             </tr>
             <tr v-for="(book, i) in books">
@@ -114,7 +104,10 @@
                 <td>{{book.year}}</td>
                 <td>{{book.is_read}}</td>
                 <td>{{book.is_owned}}</td>
-                <td><button v-on:click="remove(book, 'books', '/books')">X</button></td>
+                <td>
+                    <button v-on:click="prepareBookEntryEdit(book)">&#9881;</button>
+                    <button v-on:click="remove(book, 'books', '/books')">X</button>
+                </td>
             </tr>
         </table>
 
