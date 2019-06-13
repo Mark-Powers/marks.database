@@ -172,7 +172,39 @@
                 <td>{{
                     m.format == 0 ? 'Vinyl' : m.format == 1 ? 'CD' : 'Digital'
                 }}</td>
-                <td><button v-on:click="remove(m, 'music', '/music')">X</button></td>
+                <td>
+                    <button v-on:click="prepareMusicEntryEdit(m)">&#9881;</button>
+                    <button v-on:click="remove(m, 'music', '/music')">X</button>
+                </td>
+            </tr>
+        </table>
+
+        
+        <!-- Music Update Entry -->
+        <table v-if="activeTab == 12">
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Artist</th>
+                <th>Year</th>
+                <th>Format</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td><input v-model="emu.title" placeholder="Title"></td>
+                <td><input v-model="emu.artist" placeholder="Artist">
+                </td>
+                <td><input v-model="emu.year" placeholder="Year" size="4"></td>
+                <td>
+                    <select v-model="emu.format">
+                        <option disabled value="">Select...</option>
+                        <option value="0">Vinyl</option>
+                        <option value="1">CD</option>
+                    </select>
+                </td>
+                <td><button v-on:click="updateMany(emu, 'music', '/music');activeTab=2;">Update</button></td>
             </tr>
         </table>
 

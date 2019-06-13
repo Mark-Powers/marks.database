@@ -59,6 +59,13 @@ window.onload = function () {
                     year: new Date().getFullYear(),
                     format: 0,
                 }
+                this.emu = {
+                    title: "",
+                    artist: "",
+                    year: new Date().getFullYear(),
+                    format: 0,
+                    id:""
+                }
                 this.f = {
                     name: "",
                     note: "",
@@ -181,6 +188,14 @@ window.onload = function () {
                 this.eb.is_read = book.is_read;
                 this.eb.is_owned = book.is_owned;
                 this.activeTab = 11;
+            },
+            prepareMusicEntryEdit: function(book){
+                this.emu.id = book.id;
+                this.emu.title = book.title;
+                this.emu.artist = book.artist;
+                this.emu.year = book.year;
+                this.emu.format = book.format;
+                this.activeTab = 12;
             }
         },
         created() {
