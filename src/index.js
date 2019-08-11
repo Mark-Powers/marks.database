@@ -2,6 +2,8 @@ const server = require('./server');
 const Sequelize = require('sequelize');
 const fs = require('fs');
 const path = require('path');
+const jwt = require('jsonwebtoken');
+
 
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json')));
 
@@ -44,6 +46,15 @@ async function sync(alter, force, callback) {
 
 function setUpModels() {
   const models = {
+    "users": database.define('user', {
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },}),
     "movies": database.define('movies', {
       title: Sequelize.TEXT,
       director: Sequelize.TEXT,
