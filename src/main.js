@@ -27,12 +27,26 @@ window.onload = function () {
                     title: "",
                     director: ""
                 }
+                this.em = {
+                    year: new Date().getFullYear(),
+                    title: "",
+                    director: "",
+                    id:""
+                }
                 this.b = {
                     year: new Date().getFullYear(),
                     title: "",
                     author: "",
                     is_read: 1,
                     is_owned: 1
+                }
+                this.eb = {
+                    year: new Date().getFullYear(),
+                    title: "",
+                    author: "",
+                    is_read: 1,
+                    is_owned: 1,
+                    id:""
                 }
                 this.t = {
                     type: "",
@@ -44,6 +58,13 @@ window.onload = function () {
                     artist: "",
                     year: new Date().getFullYear(),
                     format: 0,
+                }
+                this.emu = {
+                    title: "",
+                    artist: "",
+                    year: new Date().getFullYear(),
+                    format: 0,
+                    id:""
                 }
                 this.f = {
                     name: "",
@@ -84,6 +105,18 @@ window.onload = function () {
             update: function (obj, name, path, field, value) {
                 update = {}
                 update[field] = value
+                this.requestThenUpdate(name, new Request(path, {
+                    method: 'put',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: obj.id, update: update })
+                }))
+            },
+            updateMany: function (obj, name, path) {
+                update = {}
+                update = obj;
                 this.requestThenUpdate(name, new Request(path, {
                     method: 'put',
                     headers: {
@@ -139,6 +172,30 @@ window.onload = function () {
                 })
                 console.log(list);
                 navigator.clipboard.writeText(list)
+            },
+            prepareMovieEntryEdit: function(movie){
+                this.em.id=movie.id;
+                this.em.title=movie.title;
+                this.em.director=movie.director;
+                this.em.year=movie.year;
+                this.activeTab=10;
+            },
+            prepareBookEntryEdit: function(book){
+                this.eb.id = book.id;
+                this.eb.title = book.title;
+                this.eb.author = book.author;
+                this.eb.year = book.year;
+                this.eb.is_read = book.is_read;
+                this.eb.is_owned = book.is_owned;
+                this.activeTab = 11;
+            },
+            prepareMusicEntryEdit: function(book){
+                this.emu.id = book.id;
+                this.emu.title = book.title;
+                this.emu.artist = book.artist;
+                this.emu.year = book.year;
+                this.emu.format = book.format;
+                this.activeTab = 12;
             }
         },
         created() {

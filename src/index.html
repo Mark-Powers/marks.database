@@ -30,7 +30,7 @@
                 <th>Title</th>
                 <th>Director</th>
                 <th>Year</th>
-                <th></th>
+                <th>Actions</th>
             </tr>
             <tr class="newItem">
                 <td>
@@ -51,10 +51,31 @@
                 <td>{{movie.title}}</td>
                 <td>{{movie.director}}</td>
                 <td>{{movie.year}}</td>
-                <td><button v-on:click="remove(movie, 'movies', '/movies')">X</button></td>
+                <td>
+                    <button v-on:click="prepareMovieEntryEdit(movie)">&#9881;</button>
+                    <button v-on:click="remove(movie, 'movies', '/movies')">X</button>
+                </td>
             </tr>
 
         </table>
+
+        <!-- Movies Update Entry -->
+        <table v-if="activeTab == 10">
+            <tr>
+                    <th></th>
+                    <th>Title</th>
+                    <th>Director</th>
+                    <th>Year</th>
+                    <th>Actions</th>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input v-model="em.title" placeholder="Title"></td>
+                <td><input v-model="em.director" placeholder="Director"></td>
+                <td><input v-model="em.year" placeholder="Year" size="4"></td>
+                <td><button v-on:click="updateMany(em, 'movies', '/movies');activeTab=0;">Update</button></td>
+            </tr>
+        </div>
 
         <!-- Books -->
         <table class="table" v-if="activeTab == 1">
@@ -65,26 +86,16 @@
                 <th>Year</th>
                 <th>Read?</th>
                 <th>Owned?</th>
-                <th></th>
+                <th>Actions</th>
             </tr>
             <tr class="newItem">
                 <td>
                 </td>
-                <td>
-                    <input v-model="b.title" placeholder="Title">
-                </td>
-                <td>
-                    <input v-model="b.author" placeholder="Author">
-                </td>
-                <td>
-                    <input v-model="b.year" placeholder="Year" size="4">
-                </td>
-                <td>
-                    <input v-model="b.is_read" placeholder="Read?" size="2">
-                </td>
-                <td>
-                    <input v-model="b.is_owned" placeholder="Owned?" size="2">
-                </td>
+                <td><input v-model="b.title" placeholder="Title"></td>
+                <td><input v-model="b.author" placeholder="Author"></td>
+                <td><input v-model="b.year" placeholder="Year" size="4"></td>
+                <td><input v-model="b.is_read" placeholder="Read?" size="2"></td>
+                <td><input v-model="b.is_owned" placeholder="Owned?" size="2"></td>
                 <td><button v-on:click="post(b, 'books', '/books')">Add</button></td>
             </tr>
             <tr v-for="(book, i) in books">
@@ -94,9 +105,33 @@
                 <td>{{book.year}}</td>
                 <td>{{book.is_read}}</td>
                 <td>{{book.is_owned}}</td>
-                <td><button v-on:click="remove(book, 'books', '/books')">X</button></td>
+                <td>
+                    <button v-on:click="prepareBookEntryEdit(book)">&#9881;</button>
+                    <button v-on:click="remove(book, 'books', '/books')">X</button>
+                </td>
             </tr>
         </table>
+
+        <!-- Book Update Entry -->
+        <table v-if="activeTab == 11">
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+                <th>Read?</th>
+                <th>Owned?</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td><input v-model="eb.title" placeholder="Title"></td>
+                <td><input v-model="eb.author" placeholder="Author"></td>
+                <td><input v-model="eb.year" placeholder="Year" size="4"></td>
+                <td><input v-model="eb.is_read" placeholder="Read?" size="2"></td>
+                <td><input v-model="eb.is_owned" placeholder="Owned?" size="2"></td>
+                <td><button v-on:click="updateMany(eb, 'books', '/books');activeTab=1;">Update</button></td>
+            </tr>
+        </div>
 
         <!-- Music -->
         <table class="table" v-if="activeTab == 2">
@@ -137,7 +172,39 @@
                 <td>{{
                     m.format == 0 ? 'Vinyl' : m.format == 1 ? 'CD' : 'Digital'
                 }}</td>
-                <td><button v-on:click="remove(m, 'music', '/music')">X</button></td>
+                <td>
+                    <button v-on:click="prepareMusicEntryEdit(m)">&#9881;</button>
+                    <button v-on:click="remove(m, 'music', '/music')">X</button>
+                </td>
+            </tr>
+        </table>
+
+        
+        <!-- Music Update Entry -->
+        <table v-if="activeTab == 12">
+            <tr>
+                <th></th>
+                <th>Title</th>
+                <th>Artist</th>
+                <th>Year</th>
+                <th>Format</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td><input v-model="emu.title" placeholder="Title"></td>
+                <td><input v-model="emu.artist" placeholder="Artist">
+                </td>
+                <td><input v-model="emu.year" placeholder="Year" size="4"></td>
+                <td>
+                    <select v-model="emu.format">
+                        <option disabled value="">Select...</option>
+                        <option value="0">Vinyl</option>
+                        <option value="1">CD</option>
+                    </select>
+                </td>
+                <td><button v-on:click="updateMany(emu, 'music', '/music');activeTab=2;">Update</button></td>
             </tr>
         </table>
 
